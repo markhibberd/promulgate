@@ -26,7 +26,7 @@ object PromulgateS3Plugin extends Plugin {
       Seq((a, s"${p}${n}/${v}/${n}-${v}.jar")))
   )
 
-  def promulgateS3LibSettings: Seq[Sett] = Seq(
+  def promulgateS3LibSettings: Seq[Sett] = S3Resolver.defaults ++ Seq(
     S3LibKeys.region            := Region.AP_Sydney,
     publishMavenStyle           := false,
     publishArtifact in Test     := false,
