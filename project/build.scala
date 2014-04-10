@@ -37,13 +37,14 @@ object build extends Build {
       name := "promulgate",
       version in ThisBuild := "0.11.0"
     ) ++ VersionPlugin.uniqueVersionSettings
-  , aggregate = Seq(source, info, notify_, assembly, s3, version_)
+  , aggregate = Seq(source, info, notify_, assembly, s3, version_, project_)
   ).dependsOn(source)
    .dependsOn(info)
    .dependsOn(notify_)
    .dependsOn(assembly)
    .dependsOn(s3)
    .dependsOn(version_)
+   .dependsOn(project_)
 
   lazy val source = Project(
     id = "source"
@@ -100,4 +101,18 @@ object build extends Build {
       name := "promulgate-version"
     )
   )
+
+  lazy val project_ = Project(
+    id = "project"
+  , base = file("promulgate-project")
+  , settings = standardSettings ++ Seq[Sett](
+      name := "promulgate-project"
+    )
+  ).dependsOn(source)
+   .dependsOn(info)
+   .dependsOn(notify_)
+   .dependsOn(assembly)
+   .dependsOn(s3)
+   .dependsOn(version_)
+
 }

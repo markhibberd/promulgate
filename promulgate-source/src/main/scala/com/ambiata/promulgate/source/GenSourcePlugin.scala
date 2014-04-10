@@ -5,7 +5,7 @@ import sbt._, Keys._, complete.DefaultParsers._
 object GenSourcePlugin extends Plugin {
   lazy val sourcedep        = InputKey[Unit]("source-dependency", "generate an sbt file with source deps")
 
-  def promulgateSource = Seq(
+  def promulgateSourceSettings = Seq(
     sourcedep                   :=   {
       val deps = spaceDelimited("dependency [dependency ...]").parsed.toList
       println("Generating for [" + deps.mkString(", ") + "]")
