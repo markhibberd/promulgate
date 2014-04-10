@@ -11,19 +11,16 @@ object NotifyPlugin extends Plugin {
 
   import NotifyKeys._
 
-  def promulgateNotifySettings = Seq[Sett](
+  def promulgateNotifySettings =
+    infer
+
+  def promulgateNotifyHipchatSettings = Seq[Sett](
     echoversion <<= (name, token, room, version in ThisBuild).map(HipChat.version)
   ) ++ inferHipchatToken ++ inferHipchatRoom
 
-  def inferHipchatToken: Seq[Sett] =
-    Option(System.getenv("HIPCHAT_TOKEN")) match {
-      case None => Seq()
-      case Some(token) => Seq(NotifyKeys.token := token)
-    }
+  def infer: Seq[Sett] = (for {
+    token <- Option(System.getenv("HIPCHAT_TOKEN"))
+    room <- Option(System.getenv("HIPCHAT_ROOM"))
+  } yield Seq(NotifyKeys.token := token, NotifyKeys.room := room, echoversion <<= (name, token, room, version in ThisBuild).map(HipChat.version))).getOrElse(Seq(echoversion <<= (name, version in ThisBuild).map(HipChat.console)))
 
-  def inferHipchatRoom: Seq[Sett] =
-    Option(System.getenv("HIPCHAT_ROOM")) match {
-      case None => Seq()
-      case Some(room) => Seq(NotifyKeys.room := room)
-    }
 }
