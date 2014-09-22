@@ -78,8 +78,10 @@ object build extends Build {
   , settings = standardSettings ++ Seq[Sett](
       name := "promulgate-s3"
     , resolvers += "Era7 maven releases" at "http://releases.era7.com.s3.amazonaws.com"
-    , addSbtPlugin("com.typesafe.sbt" % "sbt-s3" % "0.5")
-    , addSbtPlugin("ohnosequences" % "sbt-s3-resolver" % "0.10.1")
+    // Exclude joda-time as they are resolved with wildcards
+    , addSbtPlugin(("com.typesafe.sbt" % "sbt-s3" % "0.5") exclude("joda-time", "joda-time"))
+    , addSbtPlugin(("ohnosequences" % "sbt-s3-resolver" % "0.10.1") exclude("joda-time", "joda-time"))
+    , libraryDependencies ++= Seq("joda-time" % "joda-time" % "2.2")
     )
   ).dependsOn(assembly)
 
