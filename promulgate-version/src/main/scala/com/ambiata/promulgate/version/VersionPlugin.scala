@@ -32,7 +32,7 @@ object VersionPlugin extends Plugin {
     InetAddress.getLocalHost.getHostName
 
   def timestamp(instant: Date, format: String = "yyyyMMddHHmmss") = {
-    val formatter = new SimpleDateFormat("yyyyMMddHHmmss")
+    val formatter = new SimpleDateFormat(format)
     formatter.setTimeZone(TimeZone.getTimeZone("UTC"))
     formatter.format(instant)
   }
