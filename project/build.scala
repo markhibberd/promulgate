@@ -3,6 +3,7 @@ import Keys._
 
 import ohnosequences.sbt.SbtS3Resolver.autoImport.{s3 => ss33, _}
 import com.amazonaws.services.s3.model.Region
+import com.amazonaws.auth._, profile._
 
 object build extends Build {
   type Sett = sbt.Def.Setting[_]
@@ -26,7 +27,12 @@ object build extends Build {
       publishMavenStyle           := false
     , publishArtifact in Test     := false
     , pomIncludeRepository        := { _ => false }
-    , publishTo := Some (s3resolver.value("ambiata-oss-publish", ss33("ambiata-oss")) withIvyPatterns)
+    , publishTo := Some (S3Resolver(
+        new EnvironmentVariableCredentialsProvider() |
+        new InstanceProfileCredentialsProvider()
+      , false
+      , Region.AP_Sydney
+      , com.amazonaws.services.s3.model.CannedAccessControlList.BucketOwnerFullControl) ("ambiata-oss-publish", ss33("ambiata-oss")).withIvyPatterns)
     )
 
   lazy val promulgate = Project(
