@@ -1,7 +1,7 @@
 import sbt._
 import Keys._
 
-import ohnosequences.sbt.SbtS3Resolver.{s3 => ss33, _}
+import ohnosequences.sbt.SbtS3Resolver.autoImport.{s3 => ss33, _}
 import com.amazonaws.services.s3.model.Region
 
 object build extends Build {
@@ -22,12 +22,11 @@ object build extends Build {
       , "-feature"
       , "-language:_"
       )
-    ) ++ S3Resolver.defaults ++ Seq(
+    ) ++ Seq(
       publishMavenStyle           := false
     , publishArtifact in Test     := false
     , pomIncludeRepository        := { _ => false }
-    , publishTo                   <<= (s3credentials).apply((creds) =>
-      Some(S3Resolver(creds, false, Region.AP_Sydney)("ambiata-oss-publish", ss33("ambiata-oss")).withIvyPatterns))
+    , publishTo := Some (s3resolver.value("ambiata-oss-publish", ss33("ambiata-oss")) withIvyPatterns)
     )
 
   lazy val promulgate = Project(
@@ -80,7 +79,7 @@ object build extends Build {
     , resolvers += "Era7 maven releases" at "http://releases.era7.com.s3.amazonaws.com"
     // Exclude joda-time as they are resolved with wildcards
     , addSbtPlugin(("com.typesafe.sbt" % "sbt-s3" % "0.5") exclude("joda-time", "joda-time"))
-    , addSbtPlugin(("ohnosequences" % "sbt-s3-resolver" % "0.10.1") exclude("joda-time", "joda-time"))
+    , addSbtPlugin(("ohnosequences" % "sbt-s3-resolver" % "0.13.1") exclude("joda-time", "joda-time"))
     , libraryDependencies ++= Seq("joda-time" % "joda-time" % "2.2")
     )
   ).dependsOn(assembly)

@@ -3,8 +3,9 @@ package com.ambiata.promulgate.s3
 import sbt._, Keys._
 import sbtassembly.Plugin._, AssemblyKeys._
 import com.typesafe.sbt.S3Plugin._
-import ohnosequences.sbt.SbtS3Resolver._
+import ohnosequences.sbt.SbtS3Resolver.autoImport._
 import com.amazonaws.services.s3.model.Region
+import com.amazonaws.auth._, profile._
 
 object PromulgateS3Plugin extends Plugin {
   object S3DistKeys {
@@ -26,12 +27,17 @@ object PromulgateS3Plugin extends Plugin {
       Seq((a, s"${p}${n}/${v}/${n}-${v}.jar")))
   )
 
-  def promulgateS3LibSettings: Seq[Sett] = S3Resolver.defaults ++ Seq(
+  def promulgateS3LibSettings: Seq[Sett] = Seq(
     S3LibKeys.region            := Region.AP_Sydney,
     publishMavenStyle           := false,
     publishArtifact in Test     := false,
     pomIncludeRepository        := { _ => false },
-    publishTo                   <<= (S3LibKeys.bucket, s3credentials, S3LibKeys.region).apply((bucket, creds, region) =>
-      Some(S3Resolver(creds, false, region)("promulgate-s3-publish", s3(bucket)).withIvyPatterns))
+    s3resolver                  <<= (S3LibKeys.region).apply(region => S3Resolver(
+      new ProfileCredentialsProvider("default") |
+      new EnvironmentVariableCredentialsProvider() |
+      new InstanceProfileCredentialsProvider()
+    , false, region, com.amazonaws.services.s3.model.CannedAccessControlList.BucketOwnerFullControl)),
+    publishTo                   <<= (s3resolver, S3LibKeys.bucket).apply((resolver, bucket) => Some(resolver("promulgate-s3-publish", s3(bucket)).withIvyPatterns))
   )
+
 }
