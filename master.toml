@@ -1,0 +1,8 @@
+[master]
+  runner = "s3://ambiata-dispensary-v2/dist/master/master-scala-oss/linux/x86_64/20170530224810-6aa0431/master-scala-oss-20170530224810-6aa0431"
+  version = 1
+  sha1 = "13a01b88cc798fa6a89400ab1a77d80adf5dfe32"
+  
+[build.dist]
+
+[build.branches]
